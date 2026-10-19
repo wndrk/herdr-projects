@@ -41,5 +41,7 @@ only shows in a checkout of your own linked with `herdr plugin link`.
 - The board does not ask the terminal for its colours: it takes `COLORFGBG`, or the dark theme.
 - A plan's worktree is locked by making its files read-only; Windows still lets new files be added to its folders.
 - Another machine's board reaches this one by its name only, not its addresses.
+- Voice calls: the call's sound uses Linux's and macOS's own sound tools; on Windows there are none yet.
+- `doctor` counts a disk per drive, and a file's size on disk as its length.
 
 Something not working: say what in an issue, with your Windows version, Herdr version and terminal.

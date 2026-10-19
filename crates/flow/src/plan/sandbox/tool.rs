@@ -88,8 +88,7 @@ fn sandbox_off(given: &str) -> String {
     let out = Value::Object(o).to_string();
     if inline { return out; }
     let file = PathBuf::from(format!("{}.sandbox-off.json", given.trim_end_matches(".json")));
-    use std::os::unix::fs::OpenOptionsExt;
-    let wrote = std::fs::OpenOptions::new().write(true).create(true).truncate(true).mode(0o600).open(&file).and_then(|mut f| std::io::Write::write_all(&mut f, out.as_bytes()));
+    let wrote = crate::os::private(std::fs::OpenOptions::new().write(true).create(true).truncate(true)).open(&file).and_then(|mut f| std::io::Write::write_all(&mut f, out.as_bytes()));
     if wrote.is_ok() { file.display().to_string() } else { out }
 }
 /// A Seatbelt profile that allows everything but a write under the guarded folders, each by its real path (macOS

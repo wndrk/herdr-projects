@@ -13,7 +13,7 @@ const GB: u64 = 1_000_000_000;
 #[derive(Clone, Debug, Default)]
 pub struct Disk { pub mount: PathBuf, pub free: u64, pub total: u64, pub holds: Vec<String> }
 
-fn dev(p: &Path) -> Option<u64> { use std::os::unix::fs::MetadataExt; std::fs::metadata(p).ok().map(|m| m.dev()) }
+fn dev(p: &Path) -> Option<u64> { std::fs::metadata(p).ok().map(|m| crate::os::file_id(&m).0) }
 /// The folder a disk is mounted at: the highest parent on the same device.
 fn mount_of(p: &Path) -> PathBuf {
     let d = dev(p);
@@ -21,12 +21,7 @@ fn mount_of(p: &Path) -> PathBuf {
     while let Some(up) = at.parent() { if dev(up) != d { break; } at = up.to_path_buf(); }
     at
 }
-fn space(p: &Path) -> Option<(u64, u64)> {
-    let c = std::ffi::CString::new(p.as_os_str().as_encoded_bytes()).ok()?;
-    let mut s: libc::statvfs = unsafe { std::mem::zeroed() };
-    if unsafe { libc::statvfs(c.as_ptr(), &mut s) } != 0 { return None; }
-    Some((s.f_bavail as u64 * s.f_frsize as u64, s.f_blocks as u64 * s.f_frsize as u64))
-}
+fn space(p: &Path) -> Option<(u64, u64)> { crate::os::disk_space(p) }
 /// The nearest folder of a path that is there.
 fn there(p: &Path) -> Option<PathBuf> { p.ancestors().find(|a| a.exists()).map(Path::to_path_buf) }
 /// The places, by what they hold.
